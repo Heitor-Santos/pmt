@@ -1,27 +1,12 @@
-#include <bits/stdc++.h>
 #include <getopt.h>
+#include <iostream>
+#include <string>
+#include <vector>
+
+#include "algorithms/aho-corasick.h"
+#include "utils.h"
 
 using namespace std;
-
-vector<string> read_lines(string filename) {
-    const int MAX = 1e5 + 5;
-    FILE *file = fopen(filename.c_str(), "r");
-
-    char buffer[MAX];
-    vector<string> lines;
-
-    while (fgets(buffer, MAX, file)) {
-        string line(buffer);
-        if (!line.empty() && line.back() == '\n') {
-            line.pop_back();
-        }
-
-        lines.push_back(line);
-    }
-
-    fclose(file);
-    return lines;
-}
 
 int main(int argc, char **argv) {
     char short_options[] = "p:e:a:ch";
@@ -54,7 +39,7 @@ int main(int argc, char **argv) {
     if (pattern_file.empty()) {
         patterns.push_back(string(argv[optind++]));
     } else {
-        patterns = read_lines(pattern_file);
+        patterns = Utils::read_lines(pattern_file);
     }
 
     vector<string> text_files;
@@ -64,6 +49,6 @@ int main(int argc, char **argv) {
 
     vector<vector<string>> texts(text_files.size());
     for (int i = 0; i < (int) text_files.size(); i++) {
-        texts[i] = read_lines(text_files[i]);
+        texts[i] = Utils::read_lines(text_files[i]);
     }
 }
