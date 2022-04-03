@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "algorithms/aho-corasick.h"
+#include "algorithms/wu-manber.h"
 #include "utils.h"
 
 using namespace std;
