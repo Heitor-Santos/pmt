@@ -1,11 +1,9 @@
-#include <getopt.h>
-#include <iostream>
-#include <string>
-#include <vector>
-
 #include "algorithms/aho-corasick.h"
 #include "algorithms/wu-manber.h"
 #include "utils.h"
+
+#include <getopt.h>
+#include <iostream>
 
 using namespace std;
 

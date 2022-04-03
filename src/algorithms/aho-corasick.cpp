@@ -1,9 +1,5 @@
 #include "aho-corasick.h"
 
-#include <string>
-#include <string.h>
-#include <vector>
-
 using namespace std;
 
 Vertex::Vertex(int parent, char transition): parent(parent), transition(transition) {

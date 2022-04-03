@@ -1,9 +1,5 @@
 #include "kmp.h"
 
-#include <string>
-#include <string.h>
-#include <vector>
-
 using namespace std;
 
 KMP::KMP(vector<string> &patterns) {

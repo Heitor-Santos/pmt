@@ -1,9 +1,5 @@
 #include "sellers.h"
 
-#include <string>
-#include <string.h>
-#include <vector>
-
 using namespace std;
 
 Sellers::Sellers(vector<string> &patterns, int max_edit_distance) {
