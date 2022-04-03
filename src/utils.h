@@ -2,6 +2,7 @@
 #include <string>
 #include <string.h>
 #include <vector>
+#include <glob.h>
 
 class Occurrence {
 public:
@@ -14,4 +15,5 @@ class Utils {
 public:
     static const int ALPHABET_SIZE = 256;
     static std::vector<std::string> read_lines(std::string filename);
+    static std::vector<std::string> search_files(std::string search_pattern);
 };

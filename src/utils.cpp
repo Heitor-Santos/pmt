@@ -25,3 +25,16 @@ vector<string> Utils::read_lines(string filename) {
     fclose(file);
     return lines;
 }
+
+vector<string> Utils::search_files(string search_pattern) {
+    glob_t globbuf;
+    int err = glob(search_pattern.c_str(), 0, NULL, &globbuf);
+    vector<string> files = vector<string>();
+    if(err == 0) {
+        for (size_t i = 0; i < globbuf.gl_pathc; i++) {
+            files.emplace_back(globbuf.gl_pathv[i]);
+        }
+        globfree(&globbuf);
+    }
+    return files;
+}

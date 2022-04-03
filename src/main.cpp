@@ -67,7 +67,12 @@ int main(int argc, char **argv) {
 
     vector<string> text_files;
     for (int i = optind; i < argc; i++) {
-        text_files.push_back(string(argv[i]));
+        string file_argument = string(argv[i]);
+        if(file_argument.find('*') != string::npos){
+            vector<string> files_pt = Utils::search_files(file_argument);
+            text_files.insert(text_files.end(), files_pt.begin(), files_pt.end());
+        }
+        else text_files.push_back(file_argument);
     }
     
     vector<vector<string>> texts(text_files.size());
