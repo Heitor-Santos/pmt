@@ -48,61 +48,29 @@ int main(int argc, char **argv) {
     }
 
     if (help) {
+        cout << "A ferramenta deve ser utilizada da seguinte forma forma:" << endl;
+        cout << "./pmt [options] pattern textfile [textfile...]" << endl;
         cout << "As opções são as seguintes:" << endl;
         cout << "-e, --edit emax           Localiza todas as ocorrencias aproximadas do padrão a uma distância de edicão máxima 'emax'" << endl;
-        cout << "-p, --pattern file        Realiza a busca de todos os padroes contidos no arquivo 'file'" << endl;
-        cout << "-a, --algorithm alg_name  Realiza a busca de padroes usando o algoritmo." << endl;
-        cout << "                          As opções disponíveis de algoritmos são kmp, aho-corasick, sellers, wu-manber" << endl;
-        cout << "-c, --count:              Imprime apenas a quantidade total de ocorrencias do(s) padrão(ões) contidas no(s) arquivo(s) de texto" << endl;
+        cout << "-p, --pattern file        Realiza a busca de todos os padrões contidos no arquivo 'file'" << endl;
+        cout << "-a, --algorithm alg_name  Realiza a busca de padrões usando o algoritmo 'alg_name'" << endl;
+        cout << "                          As opções disponíveis de algoritmos são kmp, aho-corasick, sellers e wu-manber" << endl;
+        cout << "-c, --count               Imprime apenas a quantidade total de ocorrências do(s) padrão(ões) contidas no(s) arquivo(s) de texto" << endl;
         cout << "-h, --help                Imprime essa mensagem" << endl;
         return 0;
     }
 
     vector<string> patterns;
     if (pattern_file.empty()) {
+        if (optind > argc) {
+            cout << "Quando não se utiliza a opção -p (--pattern), é necessário prover um padrão através do argumento pattern em:" << endl;
+            cout << "./pmt [options] pattern textfile [textfile...]" << endl;
+            return 1;
+        }
+
         patterns.push_back(string(argv[optind++]));
     } else {
         patterns = Utils::read_lines(pattern_file);
-    }
-
-    set<string> exact_algorithms = { "kmp", "aho-corasick" };
-    set<string> all_algorithms = { "kmp", "aho-corasick", "sellers", "wu-manber" };
-
-    if (!algorithm_name.empty()){
-        if(!all_algorithms.count(algorithm_name)){
-            cout << "Essa opção de algoritmo não existe" << endl;
-            cout << "As opções disponíveis são: kmp, aho-corasick, sellers, wu-manber" << endl;
-            return 1;
-        }
-
-        if (exact_algorithms.count(algorithm_name) && edit) {
-            cout << "Esse algoritmo é para buscas exatas, não aceita o argumento edit" << endl;
-            return 1;
-        }
-
-        if (!exact_algorithms.count(algorithm_name) && e_max < 0){
-            cout << "edit tem que ser um valor não-negativo" << endl;
-            return 1;
-        }
-    } else {
-        if (edit) {
-            if (e_max < 0) {
-                cout << "edit tem que ser um valor não-negativo" << endl;
-                return 1;
-            }
-
-            int max_size = 0;
-            for (string pattern: patterns) {
-                max_size = max(max_size, (int) pattern.size());
-            }
-
-            if (max_size <= 64) algorithm_name = "wu-manber";
-            else algorithm_name = "sellers";
-        } else if ((int) patterns.size() > 1) {
-            algorithm_name = "aho-corasick";
-        } else {
-            algorithm_name = "kmp";
-        }
     }
 
     vector<string> text_files;
@@ -115,20 +83,61 @@ int main(int argc, char **argv) {
         texts[i] = Utils::read_lines(text_files[i]);
     }
 
+    int max_pattern_size = 0;
+    for (string pattern: patterns) {
+        max_pattern_size = max(max_pattern_size, (int) pattern.size());
+    }
+
+    set<string> exact_algorithms = { "kmp", "aho-corasick" };
+    set<string> all_algorithms = { "kmp", "aho-corasick", "sellers", "wu-manber" };
+
+    if (!algorithm_name.empty()){
+        if(!all_algorithms.count(algorithm_name)){
+            cout << "Essa opção de algoritmo não existe" << endl;
+            cout << "As opções disponíveis são: kmp, aho-corasick, sellers e wu-manber" << endl;
+            return 1;
+        }
+
+        if (exact_algorithms.count(algorithm_name) && edit) {
+            cout << "Esse algoritmo é para buscas exatas, portanto não aceita o argumento edit" << endl;
+            return 1;
+        }
+
+        if (!exact_algorithms.count(algorithm_name) && e_max < 0) {
+            cout << "Para se utilizar o algoritmo " << algorithm_name << " é necessário prover uma distância de edição máxima (um inteiro não-negativo)" << endl;
+            return 1;
+        }
+
+        if (algorithm_name == "wu-manber" && max_pattern_size > WuManber::MAX_ALLOWED_PATTERN_SIZE) {
+            cout << "O maior tamanho permitido para um padrão para utilizar o Wu-Manber é " << WuManber::MAX_ALLOWED_PATTERN_SIZE << endl;
+            return 1;
+        }
+    } else {
+        if (edit) {
+            if (e_max < 0) {
+                cout << "'emax' tem que ser um valor não-negativo" << endl;
+                return 1;
+            }
+
+            if (max_pattern_size <= WuManber::MAX_ALLOWED_PATTERN_SIZE) algorithm_name = "wu-manber";
+            else algorithm_name = "sellers";
+        } else if ((int) patterns.size() > 1) {
+            algorithm_name = "aho-corasick";
+        } else {
+            algorithm_name = "kmp";
+        }
+    }
+
     if (algorithm_name == "kmp") {
-        cout << "Running KMP\n";
         KMP matcher(patterns);
         get_matches(matcher, texts, count);
     } else if (algorithm_name == "aho-corasick") {
-        cout << "Running Aho-Corasick\n";
         AhoCorasick matcher(patterns);
         get_matches(matcher, texts, count);
     } else if (algorithm_name == "sellers") {
-        cout << "Running Sellers\n";
         Sellers matcher(patterns, e_max);
         get_matches(matcher, texts, count);
     } else {
-        cout << "Running Wu-Manber\n";
         WuManber matcher(patterns, e_max);
         get_matches(matcher, texts, count);
     }
