@@ -17,7 +17,7 @@ vector<Occurrence> WuManber::get_occurrences(string &text) {
         int pattern_size = pattern.size();
 
         for (int j = 0; j < pattern_size; j++) {
-            char_mask[pattern[j]] ^= (1 << j);
+            char_mask[pattern[j]] ^= (1ULL << j);
         }
 
         vector<unsigned long long int> S(max_edit_distance + 1, -1);
@@ -33,7 +33,7 @@ vector<Occurrence> WuManber::get_occurrences(string &text) {
                 new_S[k] = ((S[k] << 1) | char_mask[text[j]]) & (S[k - 1] << 1) & (new_S[k - 1] << 1) & S[k - 1];
             }
 
-            if (!(new_S[max_edit_distance] & (1 << (pattern_size - 1)))) {
+            if (!(new_S[max_edit_distance] & (1ULL << (pattern_size - 1)))) {
                 occurrences.emplace_back(j, i);
             }
 
