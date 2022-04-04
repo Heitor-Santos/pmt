@@ -48,8 +48,8 @@ int main(int argc, char **argv) {
     }
 
     if (help) {
-        cout << "A ferramenta deve ser utilizada da seguinte forma forma:" << endl;
-        cout << "./pmt [options] pattern textfile [textfile...]" << endl;
+        cout << "A ferramenta deve ser utilizada da seguinte forma:" << endl;
+        cout << "./pmt [options] pattern textfile [textfile...]" << endl << endl;
         cout << "As opções são as seguintes:" << endl;
         cout << "-e, --edit emax           Localiza todas as ocorrencias aproximadas do padrão a uma distância de edicão máxima 'emax'" << endl;
         cout << "-p, --pattern file        Realiza a busca de todos os padrões contidos no arquivo 'file'" << endl;
@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
 
     vector<string> patterns;
     if (pattern_file.empty()) {
-        if (optind > argc) {
+        if (optind >= argc) {
             cout << "Quando não se utiliza a opção -p (--pattern), é necessário prover um padrão através do argumento pattern em:" << endl;
             cout << "./pmt [options] pattern textfile [textfile...]" << endl;
             return 1;
@@ -76,6 +76,12 @@ int main(int argc, char **argv) {
     vector<string> text_files;
     for (int i = optind; i < argc; i++) {
         text_files.push_back(string(argv[i]));
+    }
+
+    if (text_files.empty()) {
+        cout << "Você precisa prover pelo menos um arquivo de texto através dos argumentos textfile em:" << endl;
+        cout << "./pmt [options] pattern textfile [textfile...]" << endl;
+        return 1;
     }
 
     vector<vector<string>> texts(text_files.size());
@@ -115,7 +121,7 @@ int main(int argc, char **argv) {
     } else {
         if (edit) {
             if (e_max < 0) {
-                cout << "'emax' tem que ser um valor não-negativo" << endl;
+                cout << "'emax' tem que ser um inteiro não-negativo" << endl;
                 return 1;
             }
 
