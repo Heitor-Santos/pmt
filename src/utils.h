@@ -1,4 +1,5 @@
 #pragma once
+#include <fstream>
 #include <string>
 #include <string.h>
 #include <vector>
@@ -13,5 +14,13 @@ public:
 class Utils {
 public:
     static const int ALPHABET_SIZE = 256;
-    static std::vector<std::string> read_lines(std::string filename);
+};
+
+class FileReader {
+private:
+    std::ifstream file;
+
+public:
+    FileReader(std::string filename);
+    bool next_line(std::string &line);
 };

@@ -1,5 +1,5 @@
 #include "utils.h"
-#include <fstream>
+#include <iostream>
 
 using namespace std;
 
@@ -7,15 +7,15 @@ Occurrence::Occurrence(int text_position): text_position(text_position) {}
 Occurrence::Occurrence(int text_position, int pattern_index):
     text_position(text_position), pattern_index(pattern_index) {}
 
-vector<string> Utils::read_lines(string filename) {
-    string line;
-    vector<string> lines;
-    ifstream file(filename);
+FileReader::FileReader(string filename) {
+    file.open(filename);
+}
 
-    while (getline(file, line)) {
-        lines.push_back(line);
+bool FileReader::next_line(string &line) {
+    if (getline(file, line)) {
+        return true;
     }
 
     file.close();
-    return lines;
+    return false;
 }

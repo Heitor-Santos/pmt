@@ -11,10 +11,13 @@
 using namespace std;
 
 template<typename T> 
-void get_matches(T matcher, vector<vector<string>>& texts, bool count) {
+void get_matches(T matcher, vector<string> &text_files, bool count) {
     int num_occurrences = 0;
-    for (vector<string> text: texts) {
-        for (string line: text) {
+    for (string text_file: text_files) {
+        string line;
+        FileReader reader(text_file);
+
+        while (reader.next_line(line)) {
             vector<Occurrence> occurrences = matcher.get_occurrences(line);
             if (count) num_occurrences += (int) occurrences.size();
             else if (!occurrences.empty()) cout << line << endl;
@@ -70,7 +73,12 @@ int main(int argc, char **argv) {
 
         patterns.push_back(string(argv[optind++]));
     } else {
-        patterns = Utils::read_lines(pattern_file);
+        string pattern;
+        FileReader reader(pattern_file);
+
+        while (reader.next_line(pattern)) {
+            patterns.push_back(pattern);
+        }
     }
 
     vector<string> text_files;
@@ -82,11 +90,6 @@ int main(int argc, char **argv) {
         cout << "Você precisa prover pelo menos um arquivo de texto através dos argumentos textfile em:" << endl;
         cout << "./pmt [options] pattern textfile [textfile...]" << endl;
         return 1;
-    }
-
-    vector<vector<string>> texts(text_files.size());
-    for (int i = 0; i < (int) text_files.size(); i++) {
-        texts[i] = Utils::read_lines(text_files[i]);
     }
 
     int max_pattern_size = 0;
@@ -136,15 +139,15 @@ int main(int argc, char **argv) {
 
     if (algorithm_name == "kmp") {
         KMP matcher(patterns);
-        get_matches(matcher, texts, count);
+        get_matches(matcher, text_files, count);
     } else if (algorithm_name == "aho-corasick") {
         AhoCorasick matcher(patterns);
-        get_matches(matcher, texts, count);
+        get_matches(matcher, text_files, count);
     } else if (algorithm_name == "sellers") {
         Sellers matcher(patterns, e_max);
-        get_matches(matcher, texts, count);
+        get_matches(matcher, text_files, count);
     } else {
         WuManber matcher(patterns, e_max);
-        get_matches(matcher, texts, count);
+        get_matches(matcher, text_files, count);
     }
 }
