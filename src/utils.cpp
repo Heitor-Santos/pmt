@@ -1,4 +1,5 @@
 #include "utils.h"
+#include <fstream>
 
 using namespace std;
 
@@ -7,21 +8,14 @@ Occurrence::Occurrence(int text_position, int pattern_index):
     text_position(text_position), pattern_index(pattern_index) {}
 
 vector<string> Utils::read_lines(string filename) {
-    const int MAX = 1e6 + 5;
-    FILE *file = fopen(filename.c_str(), "r");
-
-    char buffer[MAX];
+    string line;
     vector<string> lines;
+    ifstream file(filename);
 
-    while (fgets(buffer, MAX, file)) {
-        string line(buffer);
-        if (!line.empty() && line.back() == '\n') {
-            line.pop_back();
-        }
-
+    while (getline(file, line)) {
         lines.push_back(line);
     }
 
-    fclose(file);
+    file.close();
     return lines;
 }
