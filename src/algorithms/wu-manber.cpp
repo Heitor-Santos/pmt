@@ -26,18 +26,18 @@ vector<Occurrence> WuManber::get_occurrences(string &text) {
         }
 
         for (int j = 0; j < (int) text.size(); j++) {
-            vector<unsigned long long int> new_S(max_edit_distance + 1);
-            new_S[0] = (S[0] << 1) | char_mask[text[j]];
-
+            unsigned long long int last = (S[0] << 1) | char_mask[text[j]];
             for (int k = 1; k <= max_edit_distance; k++) {
-                new_S[k] = ((S[k] << 1) | char_mask[text[j]]) & (S[k - 1] << 1) & (new_S[k - 1] << 1) & S[k - 1];
+                unsigned long long int curr = (S[k] << 1) | char_mask[text[j]];
+                curr &= (S[k - 1] << 1) & (last << 1) & S[k - 1];
+                S[k - 1] = last;
+                last = curr;
             }
 
-            if (!(new_S[max_edit_distance] & (1ULL << (pattern_size - 1)))) {
+            S[max_edit_distance] = last;
+            if (!(S[max_edit_distance] & (1ULL << (pattern_size - 1)))) {
                 occurrences.emplace_back(j, i);
             }
-
-            S = new_S;
         }
     }
 

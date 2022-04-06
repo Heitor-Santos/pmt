@@ -28,6 +28,9 @@ void get_matches(T matcher, vector<string> &text_files, bool count) {
 }
 
 int main(int argc, char **argv) {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+
     char short_options[] = "p:e:a:ch";
     static struct option long_options[] = {
         { "pattern", required_argument, 0, 'p' },
