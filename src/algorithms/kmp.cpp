@@ -12,14 +12,17 @@ KMP::KMP(vector<string> &patterns) {
 void KMP::get_pattern_borders(int pos) {
     string current_pattern = patterns.at(pos);
     vector<int> borders = vector<int>(current_pattern.size()+1,-1);
-    for(int i=0;i<=current_pattern.size();i++){
-        for(int j=0;j<i;j++){
-            if(current_pattern.substr(0,j) == current_pattern.substr(i-j,j)){
-                borders.at(i) = j;
-            }
+    borders[1] = 0;
+    int i =1,j=0;
+    while (i+j <(int)current_pattern.size()){
+        while (i+j <(int)current_pattern.size() && current_pattern[i+j]==current_pattern[j])        {
+            j++;
+            borders[i+j]=j;
         }
+        i += (j - borders[j]);
+        j = max(0, borders[j]);        
     }
-    this->patterns_borders.at(pos) = borders;
+    this->patterns_borders[pos] = borders;
 }
 
 vector<Occurrence> KMP::get_occurrences(string &text) {
