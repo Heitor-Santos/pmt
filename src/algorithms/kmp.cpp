@@ -2,46 +2,50 @@
 using namespace std;
 
 KMP::KMP(vector<string> &patterns) {
-    this->patterns_borders = vector<vector<int>>(patterns.size());
     this->patterns = patterns;
-    for(int i=0; i<patterns.size(); i++){
+    patterns_borders.resize(patterns.size());
+
+    for(int i = 0; i < (int) patterns.size(); i++) {
         get_pattern_borders(i);
     }
 }
 
 void KMP::get_pattern_borders(int pos) {
-    string current_pattern = patterns.at(pos);
-    vector<int> borders = vector<int>(current_pattern.size()+1,-1);
-    borders[1] = 0;
-    int i =1,j=0;
-    while (i+j <(int)current_pattern.size()){
-        while (i+j <(int)current_pattern.size() && current_pattern[i+j]==current_pattern[j])        {
+    int m = patterns[pos].size();
+    patterns_borders[pos].assign(m + 1, 0);
+    patterns_borders[pos][0] = -1;
+
+    int i = 1, j = 0;
+    while (i + j < m) {
+        while (i + j < m && patterns[pos][i + j] == patterns[pos][j]) {
             j++;
-            borders[i+j]=j;
+            patterns_borders[pos][i + j] = j;
         }
-        i += (j - borders[j]);
-        j = max(0, borders[j]);        
+
+        i += j - patterns_borders[pos][j];
+        j = max(0, patterns_borders[pos][j]);
     }
-    this->patterns_borders[pos] = borders;
 }
 
 vector<Occurrence> KMP::get_occurrences(string &text) {
+    int n = text.size();
     vector<Occurrence> occurrences;
-    for (int pat_pos = 0; pat_pos < this->patterns.size(); pat_pos++) {
-        int i,j;
-        i = j = 0;
-        string current_pattern = this->patterns.at(pat_pos);
-        vector<int> current_borders = this->patterns_borders.at(pat_pos);
-        while (i<=(int)text.size()-(int)current_pattern.size()){
-            while(j<current_pattern.size() && text.at(i+j) == current_pattern.at(j)){
+
+    for (int pat_pos = 0; pat_pos < (int) patterns.size(); pat_pos++) {
+        int i = 0, j = 0, m = patterns[pat_pos].size();
+        while (i <= n - m) {
+            while (j < m && text[i + j] == patterns[pat_pos][j]) {
                 j++;
             }
-            if(j == current_pattern.size()) {
-                occurrences.emplace_back(i+current_pattern.size()-1,pat_pos);
+
+            if (j == m) {
+                occurrences.emplace_back(i + m - 1, pat_pos);
             }
-            i= i+(j-current_borders.at(j)) ;
-            j = current_borders.at(j) > 0 ? current_borders.at(j) : 0;
-        }   
+
+            i += j - patterns_borders[pat_pos][j];
+            j = patterns_borders[pat_pos][j] > 0 ? patterns_borders[pat_pos][j] : 0;
+        }
     }
+    
     return occurrences;
 }
